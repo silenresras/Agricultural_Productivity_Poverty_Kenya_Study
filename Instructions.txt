@@ -1,0 +1,6 @@
+To run the project:
+
+1. Open Stata.
+2. open the master.do file
+2. Change the working directory to the Do_files folder.
+3. Select all and execute.

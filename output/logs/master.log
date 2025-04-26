@@ -1,0 +1,421 @@
+--------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\USER\Desktop\work3\Agricultural_Productivity_Poverty_Kenya_Study\output/logs/master.log
+  log type:  text
+ opened on:  20 Apr 2025, 18:21:40
+
+. 
+. * Run analysis scripts
+. do Do_files\DescriptivesStats.do
+
+. * Import Excel Data
+. import excel "C:\Users\USER\Desktop\work3\Agricultural_Productivity_Poverty_Kenya_Study\Data\Cleaned Data.xlsx", sheet("Sheet1") fir
+> strow clear
+
+. 
+. * Descriptives Statistics
+. summarize
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+        Time |         23        2011     6.78233       2000       2022
+ Povert_rate |         23    18.11096    1.508868    16.2983       22.3
+Agricultur~d |         23    21.56517    3.279647   16.25498   28.72178
+ Labor_force |         23    1.76e+07     3354949   1.20e+07   2.26e+07
+Unemployment |         23    3.354348    1.075751       2.65      5.707
+-------------+---------------------------------------------------------
+Population~h |         23    2.614683    .4748624   1.900409   3.146264
+
+. 
+. estpost summarize
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd)     e(min)     e(max)     e(sum) 
+-------------+----------------------------------------------------------------------------------------
+        Time |        23         23       2011         46    6.78233       2000       2022      46253 
+ Povert_rate |        23         23   18.11096   2.276683   1.508868    16.2983       22.3    416.552 
+Agricultur~d |        23         23   21.56517   10.75609   3.279647   16.25498   28.72178   495.9989 
+ Labor_force |        23         23   1.76e+07   1.13e+13    3354949   1.20e+07   2.26e+07   4.05e+08 
+Unemployment |        23         23   3.354348    1.15724   1.075751       2.65      5.707      77.15 
+Population~h |        23         23   2.614683   .2254943   .4748624   1.900409   3.146264   60.13771 
+
+. esttab using "output/tables/descriptive_stats.rtf", cells("mean sd min max") replace
+(note: file output/tables/descriptive_stats.rtf not found)
+(output written to output/tables/descriptive_stats.rtf)
+
+. 
+. 
+end of do-file
+
+. do Do_files\StationarityTests.do
+
+. * Stationarity tests
+. * set the time series
+. tsset Time
+        time variable:  Time, 2000 to 2022
+                delta:  1 unit
+
+. 
+. * ADF test for Poverty Rate
+. dfuller Povert_rate, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        21
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -0.242            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.9333
+
+. 
+. * First Differencing for Poverty Rate
+. gen d_Povert_rate = d.Povert_rate
+(1 missing value generated)
+
+. 
+. * Rerun ADF test for first differenced Poverty Rate
+. dfuller d_Povert_rate, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        20
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -2.366            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.1516
+
+. 
+. * Second Differencing Differencing for Poverty Rate
+. gen d2_Povert_rate = d.d_Povert_rate
+(2 missing values generated)
+
+. 
+. * Rerun ADF test for second differenced Poverty Rate
+. dfuller d2_Povert_rate, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        19
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -5.418            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000
+
+. 
+. 
+. 
+. 
+. * ADF test for Agricultural Productivity
+. dfuller Agriculture_prod, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        21
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -2.501            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.1152
+
+. 
+. *First Differencing for Agricultural Productivity
+. gen d_Agriculture_prod = d.Agriculture_prod
+(1 missing value generated)
+
+. 
+. *Rerun ADF test for first differenced Agricultural Productivity
+. dfuller d_Agriculture_prod, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        20
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -4.144            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0008
+
+. 
+. 
+. 
+. 
+. *ADF test for Labor Force
+. dfuller Labor_force, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        21
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -0.811            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.8157
+
+. 
+. *First Differencing for Labor Force
+. gen d_Labor_force = d.Labor_force
+(1 missing value generated)
+
+. 
+. *Rerun ADF test for first differenced Labor Force
+. dfuller d_Labor_force, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        20
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -2.952            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0396
+
+. 
+. *Second Differencing Differencing for Labor Force
+. gen d2_Labor_force = d.d_Labor_force
+(2 missing values generated)
+
+. 
+. *Rerun ADF test for second differenced Labor Force
+. dfuller d2_Labor_force, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        19
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -3.173            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0216
+
+. 
+. 
+. 
+. 
+. *ADF test for Unemployment
+. dfuller Unemployment, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        21
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -1.424            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.5707
+
+. 
+. *First Differencing for Unemployment
+. gen d_Unemployment = d.Unemployment
+(1 missing value generated)
+
+. 
+. *Rerun ADF test for first differenced Unemployment
+. dfuller d_Unemployment, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        20
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -1.983            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.2940
+
+. 
+. *Second Differencing Differencing for Unemployment
+. gen d2_Unemployment = d.d_Unemployment
+(2 missing values generated)
+
+. 
+. *Rerun ADF test for second differenced Unemployment
+. dfuller d2_Unemployment, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        19
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -2.524            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.1098
+
+. 
+. *Third Differencing for Unemployment
+. gen d3_Unemployment = d.d2_Unemployment
+(3 missing values generated)
+
+. 
+. *Rerun ADF test for third differenced Unemployment
+. dfuller d3_Unemployment, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        18
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -4.128            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0009
+
+. 
+. 
+. 
+. * ADF test for Population Growth
+. dfuller Population_growth, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        21
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -0.723            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.8408
+
+. 
+. * First Differencing for Population Growth
+. gen d_Population_growth = d.Population_growth
+(1 missing value generated)
+
+. 
+. * Rerun ADF test for first differenced Population Growth
+. dfuller d_Population_growth, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        20
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -2.354            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.1551
+
+. 
+. * Second Differencing Differencing for Population Growth
+. gen d2_Population_growth = d.d_Population_growth
+(2 missing values generated)
+
+. 
+. * Rerun ADF test for second differenced Population Growth
+. dfuller d2_Population_growth, lags(1)
+
+Augmented Dickey-Fuller test for unit root         Number of obs   =        19
+
+                               ---------- Interpolated Dickey-Fuller ---------
+                  Test         1% Critical       5% Critical      10% Critical
+               Statistic           Value             Value             Value
+------------------------------------------------------------------------------
+ Z(t)             -5.123            -3.750            -3.000            -2.630
+------------------------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000
+
+. 
+end of do-file
+
+. do Do_files\Regression.do
+
+. * Regression
+. reg d2_Povert_rate d_Agriculture_prod d2_Labor_force d3_Unemployment d2_Population_growth
+
+      Source |       SS           df       MS      Number of obs   =        20
+-------------+----------------------------------   F(4, 15)        =      1.20
+       Model |  7.95709352         4  1.98927338   Prob > F        =    0.3529
+    Residual |  24.9526042        15  1.66350695   R-squared       =    0.2418
+-------------+----------------------------------   Adj R-squared   =    0.0396
+       Total |  32.9096978        19  1.73208936   Root MSE        =    1.2898
+
+--------------------------------------------------------------------------------------
+      d2_Povert_rate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+  d_Agriculture_prod |   -.079687   .1666487    -0.48   0.639    -.4348904    .2755164
+      d2_Labor_force |   9.85e-07   2.07e-06     0.48   0.641    -3.43e-06    5.40e-06
+     d3_Unemployment |   2.612036   1.558881     1.68   0.115      -.71064    5.934711
+d2_Population_growth |  -10.91186    6.21145    -1.76   0.099    -24.15125    2.327536
+               _cons |   .0965053   .2911372     0.33   0.745    -.5240389    .7170496
+--------------------------------------------------------------------------------------
+
+. 
+. esttab using "output/tables/regression_results.rtf", replace
+(note: file output/tables/regression_results.rtf not found)
+(output written to output/tables/regression_results.rtf)
+
+. 
+end of do-file
+
+. do Do_files\DiagnosticTests.do
+
+. * Diagnostic tests
+. * Multicollinearity
+. vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+d3_Unemplo~t |      2.72    0.367341
+d2_Labor_f~e |      2.03    0.491747
+d2_Populat~h |      1.65    0.607004
+d_Agricult~d |      1.06    0.944195
+-------------+----------------------
+    Mean VIF |      1.87
+
+. 
+. * Heteroscedasticity
+. estat hettest
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of d2_Povert_rate
+
+         chi2(1)      =     1.37
+         Prob > chi2  =   0.2422
+
+. 
+. * Autocorrelation
+. estat dwatson
+
+Durbin-Watson d-statistic(  5,    20) =  2.390796
+
+. 
+. * Normality Tests
+. predict residuals, residuals
+(3 missing values generated)
+
+. swilk residuals
+
+                   Shapiro-Wilk W test for normal data
+
+    Variable |        Obs       W           V         z       Prob>z
+-------------+------------------------------------------------------
+   residuals |         20    0.91715      1.961     1.357    0.08733
+
+. 
+. graph box residuals, title("Residuals Boxplot") saving("output/graphs/residuals_boxplot.gph", replace)
+(note: file output/graphs/residuals_boxplot.gph not found)
+(file output/graphs/residuals_boxplot.gph saved)
+
+. 
+. 
+end of do-file
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\USER\Desktop\work3\Agricultural_Productivity_Poverty_Kenya_Study\output/logs/master.log
+  log type:  text
+ closed on:  20 Apr 2025, 18:21:53
+--------------------------------------------------------------------------------------------------------------------------------------
